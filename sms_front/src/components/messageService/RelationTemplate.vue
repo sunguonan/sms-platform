@@ -1,0 +1,364 @@
+<template>
+  <div class="RelationTemplate">
+    <div class="search">
+      <m-form :columns="formColumns" :formData="formData"></m-form>
+    </div>
+    <div class="">
+      <el-button style="margin-right: 26px;" type="primary" @click="addRelTemplate('add')">关联更多模板</el-button>
+    </div>
+    <div v-if="cardLiStData.length > 0" class="data-list">
+      <el-card v-for="(item, index) of cardLiStData" :key="index" class="box-card">
+        <div class="card">
+          <div class="card-word">
+            <span class="word-text">{{ item.code }}</span>
+            <span class="card-img juli" @click="addRelTemplate('edit', item)">
+              <el-tooltip class="item" content="修改其他配置" effect="dark" placement="top">
+                <img alt="" src="@/assets/messageService/edit.png"/>
+              </el-tooltip>
+            </span>
+          </div>
+          <div class="name-date">
+            <p>
+              <span class="name-label">模板名称：</span>
+              <span class="name-label">{{ item.name }}</span>
+            </p>
+            <p>
+              <span class="name-label">其他配置：</span>
+              <span class="name-label">{{ item.configTemplateCode }}</span>
+            </p>
+          </div>
+        </div>
+      </el-card>
+      <div class="pick"></div>
+    </div>
+    <!-- TODO 暂无数据处理-->
+    <div v-else class="no-data">
+      <div>
+        <img alt="" src="@/assets/messageService/no-data.png"/>
+        <p>这里什么都没有哦～</p>
+      </div>
+    </div>
+    <div v-if="pageInfo.total > 16" class="paging">
+      <el-pagination :current-page="pageInfo.current" :page-size="pageInfo.size"
+                     :total="pageInfo.total" layout="total, prev, pager, next, jumper"
+                     @size-change="handleSizeChange" @current-change="handleCurrentChange">
+      </el-pagination>
+    </div>
+    <SignOrTemRelateDialog :diaFormData="temFormData" :dialogShow="dialogShow" :title="TemTitle"
+                           @closeDialog="closeDialog"/>
+  </div>
+</template>
+
+<script lang="tsx">
+import {Component, Vue} from 'vue-property-decorator'
+import SignOrTemRelateDialog from './signOrTemRelate/SignOrTemRelateDialog.vue'
+import {getList} from '@/api/ajax'
+
+@Component({
+  components: {
+    SignOrTemRelateDialog
+  }
+})
+export default class RelationTemplate extends Vue {
+  private formData = {} as any
+  private dialogShow = false
+  private TemTitle = '关联更多模板'
+  private temFormData = {}
+  private pageInfo = {
+    current: 1,
+    size: 16,
+    total: 0
+  }
+  private diaChoiceList = []
+  private cardLiStData = [] as any
+
+  get formColumns() {
+    return [
+      {
+        label: '模板编号：',
+        prop: 'code',
+        span: 6,
+        el: 'input',
+        placeholder: '请输入'
+      },
+      {
+        label: '模板名称：',
+        prop: 'name',
+        span: 6,
+        el: 'input',
+        placeholder: '请输入'
+      },
+      {
+        prop: 'btn',
+        render: () => {
+          return <div>
+            <el-button type="primary" icon="el-icon-search" onClick={this.getList}
+                       style="margin-left: 34px;margin-right: 17px;">搜索
+            </el-button>
+            <el-button icon="el-icon-edit" onClick={this.resetFun}>重置</el-button>
+          </div>
+        }
+      }
+    ]
+  }
+
+  created() {
+    this.getList()
+    this.getTemplateList()
+  }
+
+  getList() {
+    // TODO
+    const {current, size} = this.pageInfo
+    const params = {
+      current,
+      size,
+      code: this.formData.code,
+      name: this.formData.name,
+      configId: this.$route.query.id
+    }
+    this.$api.getTemplateCustomPage(params).then(res => {
+      if (res && res !== null) {
+        this.cardLiStData = [
+          ...res.records
+        ]
+      }
+    })
+  }
+
+  // 获取签名管理所有数据
+  getTemplateList() {
+    const params = {}
+    this.$api.getTemplate(params).then(res => {
+      if (res && res !== null) {
+        this.diaChoiceList = res.records.map((obj: any) => ({label: obj.name, value: obj.id}))
+      }
+    })
+  }
+
+  resetFun() {
+    this.formData = {}
+  }
+
+  addRelTemplate(type: string, item?: any) {
+    // TODO
+    this.TemTitle = type === 'add' ? '关联更多模板' : '修改其他配置'
+    this.dialogShow = true
+    const params = {
+      current: 1,
+      size: 16
+    }
+    // 请求mSelect数据传递子组件
+    getList(`/config/${this.$route.query.id}`, params).then((res: any) => {
+      if (res && res !== null) {
+        let newItem = {}
+        newItem = {
+          dataList: [...this.diaChoiceList],
+          templateIds: res.templateIds,
+          ...item,
+          formPassWayIdTem: this.$route.query.id,
+          title: '模板'
+        }
+
+        this.temFormData = {
+          ...(newItem || {})
+        }
+      }
+    })
+  }
+
+  handleSizeChange(val: any) {
+    this.pageInfo.size = val
+  }
+
+  handleCurrentChange(val: any) {
+    this.pageInfo.current = val
+    this.getList()
+  }
+
+  closeDialog() {
+    this.dialogShow = false
+    this.getList()
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.RelationTemplate {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  .data-list {
+    // width: 100%;
+    // height: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-between;
+
+    .box-card {
+      width: 24.3%;
+      margin-top: 14px;
+      // min-width: 400px;
+      border-radius: 10px;
+
+      .card {
+        width: 100%;
+        // margin-top: 20px;
+        height: 128px;
+        background-color: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+
+        .checkbox-style {
+          margin-top: 10px;
+          margin-left: 10px;
+
+          /deep/ .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner {
+            background-color: #0887e0;
+            border-color: #0887e0;
+          }
+        }
+
+        .card-word {
+          margin-left: 20px;
+          margin-top: 20px;
+          // text-align: center;
+          overflow: hidden;
+          position: relative;
+
+          .word-text {
+            font-size: 18px;
+            font-family: PingFangSC, PingFangSC-Medium;
+            font-weight: 700;
+            text-align: left;
+            color: #20232a;
+            line-height: 25px;
+            margin-right: 80px;
+          }
+
+          .card-img {
+            cursor: pointer;
+            display: inline-block;
+            text-align: right;
+
+            img {
+              width: 18px;
+              height: 18px;
+              vertical-align: middle;
+            }
+          }
+
+          .juli {
+            // margin-left: 15px;
+            position: absolute;
+            right: 16px;
+          }
+        }
+
+        .name-date {
+          margin-left: 20px;
+          margin-top: 18px;
+
+          p {
+            margin: 0;
+            margin-top: 6px;
+
+            .name-label {
+              font-size: 14px;
+              font-family: PingFangSC, PingFangSC-Light;
+              font-weight: 300;
+              text-align: left;
+              color: #777777;
+              line-height: 20px;
+            }
+          }
+        }
+      }
+    }
+
+    @media (max-width: 1630px) {
+      .box-card {
+        float: left;
+        width: 32.6%;
+        box-sizing: border-box;
+        padding: 10px;
+        min-width: 150px;
+      }
+    }
+    @media (max-width: 1366px) {
+      .box-card {
+        float: left;
+        width: 32.6%;
+        box-sizing: border-box;
+        padding: 10px;
+        min-width: 150px;
+      }
+    }
+    @media (max-width: 1200px) {
+      .box-card {
+        float: left;
+        width: 32.6%;
+        box-sizing: border-box;
+        padding: 10px;
+        min-width: 150px;
+      }
+    }
+
+    .pick {
+      width: 24.3%;
+      overflow: hidden;
+    }
+  }
+
+  .data-list:after {
+    content: '';
+    width: 24.3%;
+  }
+
+  // no-data
+  .no-data {
+    margin-top: 100px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    div {
+      img {
+        display: block;
+        width: 200px;
+        height: 168px;
+        border: 1px dashed #ccc;
+      }
+
+      p {
+        margin: 0;
+        margin-top: 32px;
+        font-size: 16px;
+        font-family: SourceHanSansCN, SourceHanSansCN-Normal;
+        font-weight: Normal;
+        text-align: center;
+        color: #20232a;
+        line-height: 24px;
+      }
+    }
+  }
+
+  .paging {
+    position: absolute;
+    margin-top: 40px;
+    margin-bottom: 50px;
+    text-align: right;
+    bottom: -10px;
+    right: 20px;
+  }
+
+  /deep/ .el-card__body {
+    padding: 0px;
+  }
+}
+</style>
