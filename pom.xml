@@ -128,15 +128,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-
-
             <dependency>
-                <groupId>com.ydl</groupId>
-                <artifactId>ydl-sms-entity</artifactId>
-                <version>${project.version}</version>
+                <groupId>com.sun</groupId>
+                <artifactId>sms-entity</artifactId>
+                <version>1.0-SNAPSHOT</version>
             </dependency>
-
-
             <!-- tools -->
             <dependency>
                 <groupId>com.ydl</groupId>

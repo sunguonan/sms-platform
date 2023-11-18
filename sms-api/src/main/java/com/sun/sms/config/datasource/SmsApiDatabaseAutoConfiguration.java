@@ -55,7 +55,7 @@ import java.util.List;
 @Configuration
 @Slf4j
 @MapperScan(
-        basePackages = {"com.ydl.sms",},
+        basePackages = {"com.sun.sms",},
         annotationClass = Repository.class,
         sqlSessionFactoryRef = SmsApiDatabaseAutoConfiguration.DATABASE_PREFIX + "SqlSessionFactory")
 @EnableConfigurationProperties({MybatisPlusProperties.class, DatabaseProperties.class})
