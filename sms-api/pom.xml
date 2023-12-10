@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.sun</groupId>
+        <groupId>com.nanyuan</groupId>
         <artifactId>sms_parent</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
@@ -113,16 +113,21 @@
             <scope>test</scope>
         </dependency>
 
+
         <dependency>
             <groupId>com.sun</groupId>
             <artifactId>sms-entity</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
             <groupId>com.ydl</groupId>
             <artifactId>ydl-tools-databases</artifactId>
         </dependency>
+        <!--        <dependency>-->
+        <!--            <groupId>com.ydl</groupId>-->
+        <!--            <artifactId>ydl-tools-dozer</artifactId>-->
+        <!--            <version>1.0-SNAPSHOT</version>-->
+        <!--        </dependency>-->
 
         <!-- @RefreshScope 需要使用 -->
         <dependency>
@@ -163,7 +168,6 @@
         <dependency>
             <groupId>com.ydl</groupId>
             <artifactId>ydl-tools-common</artifactId>
-            <version>1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
 
