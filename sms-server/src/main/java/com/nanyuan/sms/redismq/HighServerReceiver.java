@@ -25,14 +25,13 @@ public class HighServerReceiver implements MessageListener {
 
     /**
      * 消息监听
+     * 消息监听，根据消息内容调用smsConnectLoader进行通道初始化或者通道更新
      *
      * @param message
      * @param pattern
      */
     @Override
     public void onMessage(Message message, byte[] pattern) {
-        // TODO 消息监听，根据消息内容调用smsConnectLoader进行通道初始化或者通道更新
-
         // 将消息体进行反序列化，得到json字符串
         String jsonMsg = redisTemplate.getDefaultSerializer().deserialize(message.getBody()).toString();
         // 将json字符串封装成ServerTopic对象

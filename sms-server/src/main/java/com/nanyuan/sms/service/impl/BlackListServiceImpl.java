@@ -9,8 +9,6 @@ import org.springframework.stereotype.Service;
 
 /**
  * 黑名单
- *
- * 
  */
 @Service
 public class BlackListServiceImpl extends ServiceImpl<BlackListMapper, BlackListEntity> implements BlackListService {

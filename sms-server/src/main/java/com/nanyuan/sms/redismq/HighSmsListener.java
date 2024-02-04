@@ -39,9 +39,11 @@ public class HighSmsListener extends Thread {
         this.start();
     }
 
+    /**
+     * 监听TOPIC_HIGH_SMS队列，如果有消息则调用短信发送工厂发送实时短信
+     */
     @Override
     public void run() {
-        // TODO 监听TOPIC_HIGH_SMS队列，如果有消息则调用短信发送工厂发送实时短信
         // 监听    TOPIC_GENERAL_SMS 发送
         while (true) {
             log.info("队列{}正在监听中", queueKey);
