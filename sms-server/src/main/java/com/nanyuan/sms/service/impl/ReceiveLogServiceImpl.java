@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 /**
  * 接收日志表
  *
- * @author IT李老师
+ * 
  */
 @Service
 public class ReceiveLogServiceImpl extends ServiceImpl<ReceiveLogMapper, ReceiveLogEntity> implements ReceiveLogService {

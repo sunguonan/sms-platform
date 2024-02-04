@@ -8,7 +8,7 @@ import lombok.Data;
 /**
  * 配置表
  *
- * @author IT李老师
+ * 
  */
 @Data
 @ApiModel(description = "通道修改关联中的其他配置")

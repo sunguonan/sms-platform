@@ -11,7 +11,7 @@ import java.util.List;
 /**
  * 配置表
  *
- * @author IT李老师
+ * 
  */
 @Data
 @ApiModel(description = "配置表")

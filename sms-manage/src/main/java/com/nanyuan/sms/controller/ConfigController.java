@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 /**
  * 配置表
  *
- * @author IT李老师
+ * 
  */
 @RestController
 @RequestMapping("config")

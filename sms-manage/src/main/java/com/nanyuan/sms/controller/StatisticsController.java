@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 /**
  * 统计
  *
- * @author IT李老师
+ * 
  */
 @RestController
 @RequestMapping("statistics")
@@ -254,7 +254,7 @@ public class StatisticsController extends BaseController {
     })
     public R marketingTrend() {
         String platformId = "00000";// 营销平台id  先写死
-        Map params = new HashMap();
+        Map<String, Object> params = new HashMap<>();
         if (getStartCreateTime() != null)
             params.put("startCreateTime", DateUtils.format(getStartCreateTime(), DateUtils.DEFAULT_DATE_TIME_FORMAT));
         if (getEndCreateTime() != null)
@@ -288,7 +288,7 @@ public class StatisticsController extends BaseController {
             }
         }
 
-        Map result = new HashMap();
+        Map<String, Object> result = new HashMap<>();
         result.put("count", countArray);
         result.put("success", successArray);
         result.put("fail", failArray);

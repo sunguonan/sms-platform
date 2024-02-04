@@ -24,7 +24,7 @@ import java.util.UUID;
 /**
  * 配置表
  *
- * @author IT李老师
+ * 
  */
 @RestController
 @RequestMapping("platform")
@@ -38,7 +38,7 @@ public class PlatformController extends BaseController {
      * [查询] 分页查询
      *
      * @return
-     * @author IT李老师
+     * 
      */
     @GetMapping("page")
     @ApiOperation("分页")

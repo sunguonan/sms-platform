@@ -1,11 +1,3 @@
-/**
- * Copyright (c) 2019 联智合创 All rights reserved.
- * <p>
- * http://www.witlinked.com
- * <p>
- * 版权所有，侵权必究！
- */
-
 package com.nanyuan.utils;
 
 import java.io.IOException;
@@ -15,7 +7,6 @@ import java.io.StringWriter;
 /**
  * Exception工具类
  *
- * @author IT李老师
  */
 public class ExceptionUtils {
 

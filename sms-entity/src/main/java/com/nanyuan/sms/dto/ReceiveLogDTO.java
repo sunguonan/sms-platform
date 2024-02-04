@@ -7,7 +7,7 @@ import lombok.Data;
 /**
  * 接收日志表
  *
- * @author IT李老师
+ * 
  */
 @Data
 @ApiModel(description = "接收日志表")

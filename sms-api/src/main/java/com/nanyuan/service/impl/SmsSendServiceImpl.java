@@ -86,10 +86,10 @@ public class SmsSendServiceImpl implements SmsSendService {
     /**
      * 2、校验秘钥是否通过
      *
-     * @param timestamp
-     * @param accessKeyId
-     * @param accessKeySecret
-     * @param accessEncryption
+     * @param timestamp 时间戳
+     * @param accessKeyId 认证的key
+     * @param accessKeySecret 认证key密钥对
+     * @param accessEncryption 访问的密钥
      */
     private void checkAuth(String timestamp, String accessKeyId, String accessKeySecret, String accessEncryption) {
         String encryption = SmsEncryptionUtils.encode(timestamp, accessKeyId, accessKeySecret);
@@ -174,7 +174,7 @@ public class SmsSendServiceImpl implements SmsSendService {
             LocalDateTime nowDateTime =
                     LocalDateTime.now().plusMinutes(1L).withSecond(0).minusSeconds(0).withNano(0);
             // 发送时间和当前时间一致 不能发送
-            if (localDateTime.compareTo(nowDateTime) <= 0) {
+            if (!localDateTime.isAfter(nowDateTime)) {
                 throw new SmsException("发送时间过于接近当前时间，无法发送");
             }
         }
@@ -182,7 +182,6 @@ public class SmsSendServiceImpl implements SmsSendService {
 
     /**
      * 单条短信发送
-     * <p>
      * 在发送之前必须校验参数值
      * 1. 校验发送时间
      * 2. 校验系统注册
@@ -197,12 +196,11 @@ public class SmsSendServiceImpl implements SmsSendService {
         // 校验定时发送时间
         checkoutSendTime(smsParamsDTO.getSendTime());
 
-        // 1 校验系统是否注册
+        // 1、校验系统是否注册
         PlatformEntity platformEntity = checkAccessKeyId(smsParamsDTO.getAccessKeyId());
-        // 判断是否需要鉴权
-        if (platformEntity.getNeedAuth() == 1) {
-            // 需要鉴权
-            // 2 校验秘钥是否通过
+        // 判断是否需要鉴权 1为需要鉴权  
+        if (platformEntity.getNeedAuth().equals(1)) {
+            // 2、校验秘钥是否通过
             checkAuth(smsParamsDTO.getTimestamp(), platformEntity.getAccessKeyId(), platformEntity.getAccessKeySecret(), smsParamsDTO.getEncryption());
         }
 
@@ -289,12 +287,11 @@ public class SmsSendServiceImpl implements SmsSendService {
         // 3、校验手机号是否在黑名单
         checkBlack(smsSendDTO.getMobile());
 
-        // 4、校验签名
-        // 5、校验模板
+        // 4、校验签名和校验模板
         List<String> configs = checkTemplateAndSignature(smsSendDTO.getTemplate(), smsSendDTO.getSignature());
         smsSendDTO.setConfigIds(configs);
 
-        // 6、校验参数
+        // 5、校验参数
         TemplateEntity templateEntity = checkParams(smsSendDTO.getTemplate(), smsSendDTO.getParams());
 
         // 调用发送接口
@@ -302,19 +299,16 @@ public class SmsSendServiceImpl implements SmsSendService {
 
     }
 
-
-    // 缺啥补啥
-
+    
     /**
      * 根据短信模板分类 并分发
-     *
+     * 短信接收服务：将短信信息保存到数据库或者Redis队列
      * @param templateEntity 模板
      * @param smsSendDTO     短信发送表
      * @param platformEntity 秘钥认证
      */
     private void pushSmsMessage(TemplateEntity templateEntity, SmsSendDTO smsSendDTO,
                                 PlatformEntity platformEntity) {
-        // TODO 短信接收服务：将短信信息保存到数据库或者Redis队列
         ReceiveLogEntity receiveLogEntity = new ReceiveLogEntity();
         receiveLogEntity.setApiLogId(UUID.randomUUID().toString());
 
@@ -338,7 +332,7 @@ public class SmsSendServiceImpl implements SmsSendService {
                 // 保存到数据库中
                 timingPushService.save(timingPushEntity);
             } else {
-                // 3、如果是实时发送短信则将消息保存到Redis队列，判断短信模板类型  验证码短信是高优先级队列
+                // 3、如果是实时发送短信则将消息保存到Redis队列,判断短信模板类型,验证码短信是高优先级队列
                 if (templateEntity.getType() == TemplateType.VERIFICATION.getCode()) {
                     // 如果是验证码类型则将消息保存到高优先级队列TOPIC_HIGH_SMS
                     redisTemplate.opsForList().leftPush("TOPIC_HIGH_SMS", request);

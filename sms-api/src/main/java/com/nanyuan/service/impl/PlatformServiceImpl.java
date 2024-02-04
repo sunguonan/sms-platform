@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * 平台
  *
- * @author IT李老师
  */
 @Service
 public class PlatformServiceImpl extends ServiceImpl<PlatformMapper, PlatformEntity> implements PlatformService {
