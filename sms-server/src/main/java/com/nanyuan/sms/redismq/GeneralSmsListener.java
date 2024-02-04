@@ -30,7 +30,7 @@ public class GeneralSmsListener extends Thread {
     @Value("${spring.redis.queue.pop.timeout}")
     private Long popTimeout = 8000L;
 
-    private ListOperations listOps;
+    private ListOperations<String, Object> listOps;
 
     @PostConstruct
     private void init() {

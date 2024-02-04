@@ -31,13 +31,12 @@ public class SendTimingSmsImpl implements SendTimingSms {
 
     /**
      * 发送定时短信
-     *
-     * @param timing
+     * 查询数据库获取本次需要发送的定时短信，调用短信工厂发送短信
+     * @param timing  timing格式：yyyy-MM-dd HH:mm  2021-12-25 18:00
      */
     @Override
     @Async
-    public void execute(String timing) {// timing格式：yyyy-MM-dd HH:mm  2021-12-25 18:00
-        // TODO 查询数据库获取本次需要发送的定时短信，调用短信工厂发送短信
+    public void execute(String timing) {
         // 1、查询数据库获取本次需要发送的定时短信
         LambdaQueryWrapper<TimingPushEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(TimingPushEntity::getStatus, 0)

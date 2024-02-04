@@ -78,7 +78,7 @@ public class SmsFactory {
      */
     public boolean send(String deserialize) {
         Integer level = 1;
-        Integer messageErrorNum = 0;
+        int messageErrorNum = 0;
         do {
             log.info("发送短信 level:{} , json:{}", level, deserialize);
             SendLogEntity sendLog = new SendLogEntity();
@@ -89,10 +89,8 @@ public class SmsFactory {
                 SmsSendDTO smsSendDTO = JSON.parseObject(deserialize, SmsSendDTO.class);
                 AbstractSmsService abstractSmsService;
 
-                /**
-                 * 当所有通道全部尝试后，如果通道级别大于所有通道配置的级别，
-                 * 则说明所有通道都发送失败，该短信需要人工处理
-                 */
+                // 当所有通道全部尝试后，如果通道级别大于所有通道配置的级别，
+                // 则说明所有通道都发送失败，该短信需要人工处理
                 if (smsConnectLoader.checkConnectLevel(level)) {
                     log.warn("短信发送失败，需要人工介入处理");
                     ManualProcessEntity manualProcessEntity = new ManualProcessEntity();
@@ -122,17 +120,13 @@ public class SmsFactory {
                 String configId = getConfigIdByLevel(level);
 
 
-                /**
-                 * 1、获取可用通道
-                 * 发送短信需要模板和签名，需要和通道绑定
-                 * smsSendDTO.getConfigIds()： 保存了可用模板和签名的通道列表
-                 * 如果这个通道列表中包含当前通道id，则表明当前通道是可以发送这条短信的通道
-                 */
+                // 1、获取可用通道
+                // 发送短信需要模板和签名，需要和通道绑定
+                // smsSendDTO.getConfigIds()： 保存了可用模板和签名的通道列表
+                // 如果这个通道列表中包含当前通道id，则表明当前通道是可以发送这条短信的通道
                 if (smsSendDTO.getConfigIds().contains(configId)) {
-                    /**
-                     * 当前级别通道 符合 短信模板+签名支持的通达
-                     * 此方法获取的是根据配置实例化的通道连接对象
-                     */
+                    // 当前级别通道 符合 短信模板+签名支持的通达
+                    // 此方法获取的是根据配置实例化的通道连接对象
                     abstractSmsService = getSmsServiceByLevel(level);
 
                     log.info("获取到通道：{},{}", abstractSmsService.getClass().getName(), level);
@@ -149,10 +143,8 @@ public class SmsFactory {
                     continue;
                 }
 
-                /**
-                 * 已找到可用通道:
-                 * 2、构建日志对象
-                 */
+                // 已找到可用通道:
+                // 2、构建日志对象
                 sendLog.setConfigId(abstractSmsService.getConfig().getId());
                 sendLog.setConfigName(abstractSmsService.getConfig().getName());
                 sendLog.setConfigPlatform(abstractSmsService.getConfig().getPlatform());
@@ -163,17 +155,13 @@ public class SmsFactory {
                 sendLog.setApiLogId(smsSendDTO.getLogId());
                 sendLog.setStatus(1);
 
-                /**
-                 * 3、发送短信
-                 * 获得通道返回的发送状态
-                 */
+                // 3、发送短信
+                // 获得通道返回的发送状态
                 String response =
                         abstractSmsService.send(smsSendDTO.getMobile(),
                                 smsSendDTO.getParams(), smsSendDTO.getSignature(), smsSendDTO.getTemplate());
 
-                /**
-                 * 4、检查发送结果
-                 */
+                // 4、检查发送结果
                 sendLog.checkResponse(response);
                 // 发送成功
                 log.info("发送成功：{}", response);
@@ -183,23 +171,17 @@ public class SmsFactory {
                 sendLog.setStatus(0);
                 sendLog.setError(getExceptionMessage(e));
 
-                /**
-                 *
-                 * 5、重新排序通道：
-                 *
-                 * 检查通道失败次数是否超过阈值或一定比例，
-                 * 如果失败次数超过阈值，则降级通道，通道重新排序
-                 * 如果失败次数超过一定比例则启动新通道备用
-                 */
+                // 5、重新排序通道：
+                // 检查通道失败次数是否超过阈值或一定比例，
+                // 如果失败次数超过阈值，则降级通道，通道重新排序
+                // 如果失败次数超过一定比例则启动新通道备用
                 if (resetChannel(level)) {
                     level = 1;
                     continue;
                 }
 
-                /**
-                 * 6、通道热切换
-                 * 如果当前短信重试次数超过阈值，则切换下一级别通道
-                 */
+                // 6、通道热切换
+                // 如果当前短信重试次数超过阈值，则切换下一级别通道
                 if (messageErrorNum >= smsProperties.getMessageErrorNum()) {
                     // 短信单通道失败次数达到阈值
                     messageErrorNum = 0;
