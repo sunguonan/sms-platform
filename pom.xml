@@ -22,6 +22,7 @@
         <module>sms-manage</module>
         <module>sms-sdk</module>
         <module>sms-server</module>
+        <module>sms_test</module>
     </modules>
 
     <properties>
